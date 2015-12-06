@@ -1,7 +1,13 @@
 [package]
 name = "json_flex"
+description = "Flexibly Parse a JSON string"
+homepage = "http://nacika.com"
+repository = "https://github.com/nacika-ins/json_flex"
+readme = "README.md"
+keywords = ["json"]
+license = "MIT"
 version = "0.1.0"
 authors = ["nacika <nacika.inscatolare@gmail.com>"]
 
-[dependencies.rustc-serialize]
-git = "https://github.com/rust-lang-nursery/rustc-serialize.git"
+[dependencies]
+rustc-serialize="*"
