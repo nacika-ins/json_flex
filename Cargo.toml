@@ -1,0 +1,7 @@
+[package]
+name = "json_flex"
+version = "0.1.0"
+authors = ["nacika <nacika.inscatolare@gmail.com>"]
+
+[dependencies.rustc-serialize]
+git = "https://github.com/rust-lang-nursery/rustc-serialize.git"
