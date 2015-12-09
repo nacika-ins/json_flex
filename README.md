@@ -29,10 +29,11 @@ use json_flex::{JFObject, Unwrap};
 fn main() {
     let array = json_flex::decode(r#"[1,2,3,4]"#.to_owned());
     println!("{:?}", array);
-
+    println!("{:?}", array.to_json());
 
     let array = json_flex::decode(r#"["1","2","3","4"]"#.to_owned());
     println!("{:?}", array[0].into_string());
+    println!("{:?}", array.to_json());
 }
 ```
 
