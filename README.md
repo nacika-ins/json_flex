@@ -7,15 +7,15 @@ Flexibly Parse a JSON string
 Add this to your `Cargo.toml`:
 
 ```toml
-[dependencies.json_flex]
-git = "https://github.com/nacika-ins/json_flex.git"
+[dependencies]
+json_flex = "*"
 ```
 
 and this to your crate root:
 
 ```rust
 extern crate json_flex;
-use json_flex::{JsonFlex, JFObject, Unwrap};
+use json_flex::{JFObject, Unwrap};
 ```
 
 ## Example
@@ -26,11 +26,11 @@ extern crate json_flex;
 use json_flex::{JsonFlex, JFObject, Unwrap};
 
 fn main() {
-    let array = JsonFlex::decode(r#"[1,2,3,4]"#.to_owned());
+    let array = json_flex::decode(r#"[1,2,3,4]"#.to_owned());
     println!("{:?}", array);
 
 
-    let array = JsonFlex::decode(r#"["1","2","3","4"]"#.to_owned());
+    let array = json_flex::decode(r#"["1","2","3","4"]"#.to_owned());
     println!("{:?}", array[0].into_string());
 }
 ```
