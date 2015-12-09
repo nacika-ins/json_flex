@@ -3,7 +3,7 @@ use json_flex::{JFObject, Unwrap};
 use std::collections::HashMap;
 
 #[test]
-fn test () {
+fn default () {
 
     /* 1
     -------------------------------------------------------------------------------*/
@@ -12,6 +12,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([String("a"), String("b"), String("c"), Array([String("a"), String("b"), String("c")]), String("d"), Array([String("ABC")]), Array([Integer(1), Integer(2)])])"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"["a","b","c",["a","b","c"],"d",["ABC"],[1,2]]"#);
 
     /* 2
     -------------------------------------------------------------------------------*/
@@ -20,6 +23,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Integer(1), Array([Integer(2), Array([Integer(3)])])])"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[1,[2,[3]]]"#);
 
     /* 3
     -------------------------------------------------------------------------------*/
@@ -28,6 +34,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Integer(1), Array([Integer(2), Array([Integer(3), Integer(4), Integer(5), Integer(6)])])])"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[1,[2,[3,4,5,6]]]"#);
 
     /* 4
     -------------------------------------------------------------------------------*/
@@ -36,6 +45,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([String("1"), Array([String("2"), Array([String("3"), String("4"), String("5"), String("6")])])])"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"["1",["2",["3","4","5","6"]]]"#);
 
     /* 5                           [[1],[2,3,4,[5,6,7,[8,9],11],12,13],14,15]
     -------------------------------------------------------------------------------*/
@@ -44,6 +56,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Array([Integer(1)]), Array([Integer(2), Integer(3), Integer(4), Array([Integer(5), Integer(6), Integer(7), Array([Integer(8), Integer(9)]), Integer(11)]), Integer(12), Integer(13)]), Integer(14), Integer(15)])"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[[1],[2,3,4,[5,6,7,[8,9],11],12,13],14,15]"#);
 
     /* 6
     -------------------------------------------------------------------------------*/
@@ -52,6 +67,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([String("a"), String("b"), String("c"), Array([String("a"), String("b"), String("c")]), String("d"), Array([String("ABC")]), Array([Integer(1), Integer(2)])])"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"["a","b","c",["a","b","c"],"d",["ABC"],[1,2]]"#);
 
     /* 7
     -------------------------------------------------------------------------------*/
@@ -60,6 +78,10 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": String("def")})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[{"abc":"def"}]"#);
+    
 
     /* 8
     -------------------------------------------------------------------------------*/
@@ -68,6 +90,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": Integer(123)})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[{"abc":123}]"#);
 
     /* 9
     -------------------------------------------------------------------------------*/
@@ -76,6 +101,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": Array([Integer(1)])})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[{"abc":[1]}]"#);
 
     /* 10
     -------------------------------------------------------------------------------*/
@@ -84,6 +112,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": Array([String("1")])})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[{"abc":["1"]}]"#);
 
     /* 12
     -------------------------------------------------------------------------------*/
@@ -92,6 +123,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": Dictionary({"def": String("ghi")})})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[{"abc":{"def":"ghi"}}]"#);
 
     /* 13
     -------------------------------------------------------------------------------*/
@@ -100,6 +134,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": Dictionary({"def": Array([String("1"), String("2"), String("3")])})})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[{"abc":{"def":["1","2","3"]}}]"#);
 
     /* 14
     -------------------------------------------------------------------------------*/
@@ -108,6 +145,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": String("def"), "ghi": String("jkl")})])"# || jft == r#"Array([Dictionary({"ghi": String("jkl"), "abc": String("def")})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert!(json == r#"[{"abc":"def","ghi":"jkl"}]"# || json == r#"[{"ghi":"jkl","abc":"def"}]"#);
 
     /* 15
     -------------------------------------------------------------------------------*/
@@ -116,6 +156,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"def": Integer(456), "abc": Integer(123)})])"# || jft == r#"Array([Dictionary({"abc": Integer(123), "def": Integer(456)})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert!(json == r#"[{"abc":123,"def":456}]"# || json == r#"[{"def":456,"abc":123}]"#);
 
     /* 16
     -------------------------------------------------------------------------------*/
@@ -124,6 +167,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Dictionary({"abc": Integer(123), "def": Dictionary({"ghi": Array([Integer(1), Integer(2), Integer(3), Dictionary({"ssss": String("ssssss")})])})})])"# || jft == r#"Array([Dictionary({"def": Dictionary({"ghi": Array([Integer(1), Integer(2), Integer(3), Dictionary({"ssss": String("ssssss")})])}), "abc": Integer(123)})])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert!(json == r#"[{"abc":123,"def":{"ghi":[1,2,3,{"ssss":"ssssss"}]}}]"# || json == r#"[{"def":{"ghi":[1,2,3,{"ssss":"ssssss"}]},"abc":123}]"#);
 
     /* 17 (Google JSON)
     -------------------------------------------------------------------------------*/
@@ -132,6 +178,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Null, String("foo foo bar"), Array([]), Array([String("URL"), String("NAME")]), Array([])])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[null,"foo foo bar",[],["URL","NAME"],[]]"#);
 
     /* 18 (Google JSON)
     -------------------------------------------------------------------------------*/
@@ -140,6 +189,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Null, Null, Null, Null, Null, Null, Null, Null, String("foo foo bar"), Array([]), Array([String("URL"), String("NAME")]), Array([])])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[null,null,null,null,null,null,null,null,"foo foo bar",[],["URL","NAME"],[]]"#);
 
     /* 19 (Google JSON)
     -------------------------------------------------------------------------------*/
@@ -148,6 +200,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([String("foo foo bar"), Array([]), Array([String("URL"), String("NAME")]), Array([]), Null])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"["foo foo bar",[],["URL","NAME"],[],null]"#);
 
     /* 20 (Google JSON)
     -------------------------------------------------------------------------------*/
@@ -156,7 +211,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([String("foo foo bar"), Array([]), Array([String("URL"), String("NAME")]), Array([]), Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null, Null])"#);
-
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"["foo foo bar",[],["URL","NAME"],[],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]"#);
 
     /* 21 (Google JSON)
     -------------------------------------------------------------------------------*/
@@ -165,6 +222,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Null, Null])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[null,null]"#);
 
     /* 22
     -------------------------------------------------------------------------------*/
@@ -173,6 +233,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Integer(-100)])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[-100]"#);
 
     /* 23
     -------------------------------------------------------------------------------*/
@@ -181,6 +244,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Integer(-100), Integer(-200), Integer(-300)])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[-100,-200,-300]"#);
 
     /* 24
     -------------------------------------------------------------------------------*/
@@ -188,6 +254,9 @@ fn test () {
     let jf = json_flex::decode(r#"{"foo": -100}"#.to_owned());
     let jft = format!("{:?}", jf);
     assert!(jft == r#"Dictionary({"foo": Integer(-100)})"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"{"foo":-100}"#);
 
     /* 25
     -------------------------------------------------------------------------------*/
@@ -195,6 +264,9 @@ fn test () {
     let jf = json_flex::decode(r#"{"foo": [1,2,3] }"#.to_owned());
     let jft = format!("{:?}", jf);
     assert!(jft == r#"Dictionary({"foo": Array([Integer(1), Integer(2), Integer(3)])})"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"{"foo":[1,2,3]}"#);
 
     /* 26
     -------------------------------------------------------------------------------*/
@@ -202,7 +274,9 @@ fn test () {
     let jf = json_flex::decode(r#"{"foo": {"baz": 1, "fum": "2" } }"#.to_owned());
     let jft = format!("{:?}", jf);
     assert!(jft == r#"Dictionary({"foo": Dictionary({"baz": Integer(1), "fum": String("2")})})"# || jft == r#"Dictionary({"foo": Dictionary({"fum": String("2"), "baz": Integer(1)})})"#);
-
+    let json = jf.to_json();
+    println!("{}", json);
+    assert!(json == r#"{"foo":{"baz":1,"fum":"2"}}"# || json == r#"{"foo":{"fum":"2","baz":1}}"#);
 
     /* 27
     -------------------------------------------------------------------------------*/
@@ -211,6 +285,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([True])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[true]"#);
 
     /* 28
     -------------------------------------------------------------------------------*/
@@ -219,6 +296,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([True, True])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[true,true]"#);
 
     /* 29
     -------------------------------------------------------------------------------*/
@@ -227,6 +307,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([False])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[false]"#);
 
     /* 30
     -------------------------------------------------------------------------------*/
@@ -235,6 +318,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([False, False])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[false,false]"#);
 
     /* 31
     -------------------------------------------------------------------------------*/
@@ -243,6 +329,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Dictionary({"foo": True})"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"{"foo":true}"#);
 
     /* 32
     -------------------------------------------------------------------------------*/
@@ -251,6 +340,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Dictionary({"foo": False})"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"{"foo":false}"#);
 
     /* 33
     -------------------------------------------------------------------------------*/
@@ -259,6 +351,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Dictionary({"foo": True, "baz": False})"# || jft == r#"Dictionary({"baz": False, "foo": True})"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert!(json == r#"{"foo":true,"baz":false}"# || json == r#"{"baz":false,"foo":true}"#);
 
     /* 34
     -------------------------------------------------------------------------------*/
@@ -266,6 +361,9 @@ fn test () {
     let jf = json_flex::decode(r#"{"foo": false, "baz": true}"#.to_owned());
     let jft = format!("{:?}", jf);
     assert!(jft == r#"Dictionary({"baz": True, "foo": False})"# || jft == r#"Dictionary({"foo": False, "baz": True})"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert!(json == r#"{"foo":false,"baz":true}"# || json == r#"{"baz":true,"foo":false}"#);
 
     /* 35
     -------------------------------------------------------------------------------*/
@@ -274,6 +372,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Null])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[null]"#);
 
     /* 36
     -------------------------------------------------------------------------------*/
@@ -282,6 +383,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Array([Null, Null])"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[null,null]"#);
 
     /* 37
     -------------------------------------------------------------------------------*/
@@ -290,6 +394,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Dictionary({"foo": Null})"#);
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"{"foo":null}"#);
 
     /* 38
     -------------------------------------------------------------------------------*/
@@ -298,7 +405,9 @@ fn test () {
     let jft = format!("{:?}", jf);
     println!("{}", jft);
     assert!(jft == r#"Dictionary({"baz": Null, "foo": Null})"# || jft == r#"Dictionary({"foo": Null, "baz": Null})"#);
-
+    let json = jf.to_json();
+    println!("{}", json);
+    assert!(json == r#"{"foo":null,"baz":null}"# || json == r#"{"baz":null,"foo":null}"#);
 
     /* 39
     -------------------------------------------------------------------------------*/
@@ -606,8 +715,19 @@ fn test () {
     println!("{}", jft);
     assert_eq!(jft, r#"String("bar")"#);
     
+    /* 75
+    -------------------------------------------------------------------------------*/
+    let jf = json_flex::decode(r#"[1,2,3,4,5,[1,2,3,4,5]]"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[1,2,3,4,5,[1,2,3,4,5]]"#);
     
-    
+    /* 76
+    -------------------------------------------------------------------------------*/
+    let jf = json_flex::decode(r#"[1,2,3,4,5,[1,2,3,4,5,{"hoge": [1,2,3,4,5]}]]"#.to_owned());
+    let json = jf.to_json();
+    println!("{}", json);
+    assert_eq!(json, r#"[1,2,3,4,5,[1,2,3,4,5,{"hoge":[1,2,3,4,5]}]]"#);
     
 
 }

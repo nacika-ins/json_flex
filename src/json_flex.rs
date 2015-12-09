@@ -128,6 +128,44 @@ impl JFObject {
             _ => panic!(),
         }
     }
+
+    pub fn to_json(&self) -> String {
+        match self {
+            &JFObject::String(ref v) => format!("\"{}\"", v),
+            &JFObject::Integer(ref v) => v.to_string(),
+            &JFObject::Float(ref v) => v.to_string(),
+            &JFObject::Dictionary(ref v) => {
+                let mut string: String = "".to_owned();
+                let mut is_first = true;
+                for (k, v) in v {
+                    if is_first {
+                        is_first = false;
+                    } else {
+                        string.push(',');
+                    }
+                    string.push_str(&format!("\"{}\":", k));
+                    string.push_str(&v.to_json());
+                }
+                format!("{{{}}}", string)
+            }
+            &JFObject::Array(ref v) => {
+                let mut string: String = "".to_owned();
+                let mut is_first = true;
+                for i in v {
+                    if is_first {
+                        is_first = false;
+                    } else {
+                        string.push(',');
+                    }
+                    string.push_str(&i.to_json());
+                }
+                format!("[{}]", string)
+            }
+            &JFObject::Null => "null".to_owned(),
+            &JFObject::False => "false".to_owned(),
+            &JFObject::True => "true".to_owned(),
+        }
+    }
 }
 
 pub trait Unwrap<T> {
@@ -237,14 +275,14 @@ fn recursive(v: &mut JFObject,
                     Some(mut vvvv) => {
                         a_nest += 1;
                         recursive(&mut vvvv,
-                                            a_chain.clone(),
-                                            d_chain.clone(),
-                                            a_nest,
-                                            d_nest,
-                                            last_c,
-                                            func,
-                                            value.clone(),
-                                            log);
+                                  a_chain.clone(),
+                                  d_chain.clone(),
+                                  a_nest,
+                                  d_nest,
+                                  last_c,
+                                  func,
+                                  value.clone(),
+                                  log);
                         a_nest -= 1;
                         true
                     }
@@ -275,14 +313,14 @@ fn recursive(v: &mut JFObject,
                         Some(mut vvvv) => {
                             d_nest += 1;
                             recursive(&mut vvvv,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                value.clone(),
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      value.clone(),
+                                      log);
                             d_nest -= 1;
                             true
                         }
@@ -364,8 +402,8 @@ pub fn decode(text: String) -> Box<JFObject> {
         };
 
         if DEBUG {
-            println!("\x1b[32mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- \
-                      s: {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
+            println!("\x1b[32mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- s: \
+                      {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
                      body[pos],
                      last_chain,
                      chain,
@@ -429,14 +467,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
                         }
                     }
                 };
@@ -473,14 +511,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                             }
                         }
                         recursive(&mut ret,
-                                            a_chain.clone(),
-                                            d_chain.clone(),
-                                            a_nest,
-                                            d_nest,
-                                            last_c,
-                                            func,
-                                            None,
-                                            log);
+                                  a_chain.clone(),
+                                  d_chain.clone(),
+                                  a_nest,
+                                  d_nest,
+                                  last_c,
+                                  func,
+                                  None,
+                                  log);
 
 
                         chain.pop().unwrap();
@@ -515,14 +553,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                             }
                         }
                         recursive(&mut ret,
-                                            a_chain.clone(),
-                                            d_chain.clone(),
-                                            a_nest,
-                                            d_nest,
-                                            last_c,
-                                            func,
-                                            None,
-                                            log);
+                                  a_chain.clone(),
+                                  d_chain.clone(),
+                                  a_nest,
+                                  d_nest,
+                                  last_c,
+                                  func,
+                                  None,
+                                  log);
 
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
@@ -556,14 +594,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                             }
                         }
                         recursive(&mut ret,
-                                            a_chain.clone(),
-                                            d_chain.clone(),
-                                            a_nest,
-                                            d_nest,
-                                            last_c,
-                                            func,
-                                            None,
-                                            log);
+                                  a_chain.clone(),
+                                  d_chain.clone(),
+                                  a_nest,
+                                  d_nest,
+                                  last_c,
+                                  func,
+                                  None,
+                                  log);
 
 
                         chain.pop().unwrap();
@@ -601,14 +639,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                             }
                         }
                         recursive(&mut ret,
-                                            a_chain.clone(),
-                                            d_chain.clone(),
-                                            a_nest,
-                                            d_nest,
-                                            last_c,
-                                            func,
-                                            Some(num),
-                                            log);
+                                  a_chain.clone(),
+                                  d_chain.clone(),
+                                  a_nest,
+                                  d_nest,
+                                  last_c,
+                                  func,
+                                  Some(num),
+                                  log);
 
                         num = "".to_owned();
 
@@ -642,14 +680,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
 
                         }
 
@@ -711,14 +749,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
                         }
                     }
                 }
@@ -773,14 +811,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
 
 
                         }
@@ -832,14 +870,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
 
                         }
 
@@ -890,14 +928,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
 
                         }
 
@@ -947,14 +985,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                Some(num.clone()),
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      Some(num.clone()),
+                                      log);
 
                         }
                         num = "".to_owned();
@@ -1047,14 +1085,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
 
                         }
 
@@ -1108,14 +1146,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
 
                         }
 
@@ -1166,14 +1204,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
 
                         }
 
@@ -1214,14 +1252,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                 }
                             }
                             recursive(&mut ret,
-                                                a_chain.clone(),
-                                                d_chain.clone(),
-                                                a_nest,
-                                                d_nest,
-                                                last_c,
-                                                func,
-                                                None,
-                                                log);
+                                      a_chain.clone(),
+                                      d_chain.clone(),
+                                      a_nest,
+                                      d_nest,
+                                      last_c,
+                                      func,
+                                      None,
+                                      log);
                         }
 
 
@@ -1271,7 +1309,11 @@ pub fn decode(text: String) -> Box<JFObject> {
                                                       JFObject::Float(f64::from_str(&new_num)
                                                                           .unwrap()))
                                         }
-                                        None    => vv.insert(key, JFObject::Integer(i64::from_str(&new_num).unwrap()) ),
+                                        None => {
+                                            vv.insert(key,
+                                                      JFObject::Integer(i64::from_str(&new_num)
+                                                                            .unwrap()))
+                                        }
                                     };
 
 
@@ -1280,14 +1322,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                             }
                         }
                         recursive(&mut ret,
-                                            a_chain.clone(),
-                                            d_chain.clone(),
-                                            a_nest,
-                                            d_nest,
-                                            last_c,
-                                            func,
-                                            Some(num),
-                                            log);
+                                  a_chain.clone(),
+                                  d_chain.clone(),
+                                  a_nest,
+                                  d_nest,
+                                  last_c,
+                                  func,
+                                  Some(num),
+                                  log);
 
                         num = "".to_owned();
                         chain.pop().unwrap();
@@ -1350,14 +1392,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                     }
                                 }
                                 recursive(&mut ret,
-                                                    a_chain.clone(),
-                                                    d_chain.clone(),
-                                                    a_nest,
-                                                    d_nest,
-                                                    last_c,
-                                                    func,
-                                                    Some(string.clone()),
-                                                    log);
+                                          a_chain.clone(),
+                                          d_chain.clone(),
+                                          a_nest,
+                                          d_nest,
+                                          last_c,
+                                          func,
+                                          Some(string.clone()),
+                                          log);
                                 d_chain.pop().unwrap();
                                 string = "".to_owned();
                             } else if last_chain != 'd' {
@@ -1390,14 +1432,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                         }
                                     }
                                     recursive(&mut ret,
-                                                        a_chain.clone(),
-                                                        d_chain.clone(),
-                                                        a_nest,
-                                                        d_nest,
-                                                        last_c,
-                                                        func,
-                                                        Some(string),
-                                                        log);
+                                              a_chain.clone(),
+                                              d_chain.clone(),
+                                              a_nest,
+                                              d_nest,
+                                              last_c,
+                                              func,
+                                              Some(string),
+                                              log);
                                 }
                                 string = "".to_owned();
                             }
@@ -1446,14 +1488,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                     }
                                 }
                                 recursive(&mut ret,
-                                                    a_chain.clone(),
-                                                    d_chain.clone(),
-                                                    a_nest,
-                                                    d_nest,
-                                                    last_c,
-                                                    func,
-                                                    Some(string.clone()),
-                                                    log);
+                                          a_chain.clone(),
+                                          d_chain.clone(),
+                                          a_nest,
+                                          d_nest,
+                                          last_c,
+                                          func,
+                                          Some(string.clone()),
+                                          log);
                                 d_chain.pop().unwrap();
                                 string = "".to_owned();
                             } else {
@@ -1486,14 +1528,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                         }
                                     }
                                     recursive(&mut ret,
-                                                        a_chain.clone(),
-                                                        d_chain.clone(),
-                                                        a_nest,
-                                                        d_nest,
-                                                        last_c,
-                                                        func,
-                                                        Some(string),
-                                                        log);
+                                              a_chain.clone(),
+                                              d_chain.clone(),
+                                              a_nest,
+                                              d_nest,
+                                              last_c,
+                                              func,
+                                              Some(string),
+                                              log);
                                 }
                                 string = "".to_owned();
                             }
@@ -1596,8 +1638,8 @@ pub fn decode(text: String) -> Box<JFObject> {
         };
 
         if DEBUG {
-            println!("\x1b[35mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- \
-                      s: {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
+            println!("\x1b[35mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- s: \
+                      {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
                      body[pos],
                      last_chain,
                      chain,
