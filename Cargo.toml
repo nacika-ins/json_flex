@@ -6,7 +6,7 @@ repository = "https://github.com/nacika-ins/json_flex"
 readme = "README.md"
 keywords = ["json"]
 license = "MIT"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["nacika <nacika.inscatolare@gmail.com>"]
 
 [dependencies]

@@ -242,6 +242,7 @@ fn recursive(v: &mut JFObject,
              d_chain: Vec<String>,
              mut a_nest: i64,
              mut d_nest: i64,
+             last_chain: char,
              last_c: char,
              func: fn(&mut JFObject,
                       Option<String>,
@@ -258,20 +259,21 @@ fn recursive(v: &mut JFObject,
     if DEBUG {
         log = format!("{}{}",
                       log,
-                      format!("--> [a_nest:{} d_nest:{}] ", a_nest, d_nest).to_owned());
+                      format!("--> [a_chain: {:?}, a_nest:{}  d_chain: {:?}, d_nest:{}] ",
+                              a_chain,
+                              a_nest,
+                              d_chain,
+                              d_nest)
+                          .to_owned());
     }
 
     let is_find = match *v {
 
         JFObject::Array(ref mut vvz) => {
-
             let i = *a_chain.get(a_nest as usize).unwrap();
-
             let is_find: bool = {
                 let vvv = vvz.get_mut(i as usize);
-
                 let is_find: bool = match vvv {
-
                     Some(mut vvvv) => {
                         a_nest += 1;
                         recursive(&mut vvvv,
@@ -279,6 +281,7 @@ fn recursive(v: &mut JFObject,
                                   d_chain.clone(),
                                   a_nest,
                                   d_nest,
+                                  last_chain,
                                   last_c,
                                   func,
                                   value.clone(),
@@ -286,30 +289,21 @@ fn recursive(v: &mut JFObject,
                         a_nest -= 1;
                         true
                     }
-
                     None => false,
                 };
                 is_find
             };
-
             if !is_find {
             }
-
             is_find
         }
 
         JFObject::Dictionary(ref mut vv) => {
-
             let o_key = d_chain.get(d_nest as usize);
-
             match o_key {
-
                 Some(ref key) => {
-
                     let vvv = vv.get_mut(key.clone());
-
                     let is_find: bool = match vvv {
-
                         Some(mut vvvv) => {
                             d_nest += 1;
                             recursive(&mut vvvv,
@@ -317,6 +311,7 @@ fn recursive(v: &mut JFObject,
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       value.clone(),
@@ -324,18 +319,13 @@ fn recursive(v: &mut JFObject,
                             d_nest -= 1;
                             true
                         }
-
                         None => false,
                     };
                     is_find
-
                 }
-
                 None => false,
             }
-
         }
-
         _ => true,
     };
 
@@ -348,9 +338,7 @@ fn recursive(v: &mut JFObject,
              d_nest,
              last_c);
     }
-
     is_find
-
 }
 
 pub fn decode(text: String) -> Box<JFObject> {
@@ -402,21 +390,22 @@ pub fn decode(text: String) -> Box<JFObject> {
         };
 
         if DEBUG {
-            println!("\x1b[32mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- s: \
-                      {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
-                     body[pos],
-                     last_chain,
-                     chain,
-                     a_chain,
-                     d_chain,
-                     string,
-                     num,
-                     last_active_char,
-                     s_true,
-                     s_false,
-                     s_null);
+            if c != ' ' {
+                println!("\x1b[32mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- \
+                          s: {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
+                         body[pos],
+                         last_chain,
+                         chain,
+                         a_chain,
+                         d_chain,
+                         string,
+                         num,
+                         last_active_char,
+                         s_true,
+                         s_false,
+                         s_null);
+            }
         }
-
 
         match c {
 
@@ -471,6 +460,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
@@ -489,6 +479,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                     't' => {
 
                         s_true.pop().unwrap();
+                        s_true = s_true.trim().to_string();
                         if s_true != "true" {
                             panic!("parse error");
                         }
@@ -515,22 +506,23 @@ pub fn decode(text: String) -> Box<JFObject> {
                                   d_chain.clone(),
                                   a_nest,
                                   d_nest,
+                                  last_chain,
                                   last_c,
                                   func,
                                   None,
                                   log);
 
-
+                        chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                         a_chain.pop().unwrap();
-
                         s_true = "".to_owned();
                     }
 
                     'f' => {
 
                         s_false.pop().unwrap();
+                        s_false = s_false.trim().to_string();
                         if s_false != "false" {
                             panic!("parse error");
                         }
@@ -557,11 +549,13 @@ pub fn decode(text: String) -> Box<JFObject> {
                                   d_chain.clone(),
                                   a_nest,
                                   d_nest,
+                                  last_chain,
                                   last_c,
                                   func,
                                   None,
                                   log);
 
+                        chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                         a_chain.pop().unwrap();
@@ -572,6 +566,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                     '0' => {
 
                         s_null.pop().unwrap();
+                        s_null = s_null.trim().to_string();
                         if s_null != "null" {
                             panic!("parse error");
                         }
@@ -598,12 +593,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                   d_chain.clone(),
                                   a_nest,
                                   d_nest,
+                                  last_chain,
                                   last_c,
                                   func,
                                   None,
                                   log);
 
 
+                        chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                         a_chain.pop().unwrap();
@@ -643,6 +640,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                   d_chain.clone(),
                                   a_nest,
                                   d_nest,
+                                  last_chain,
                                   last_c,
                                   func,
                                   Some(num),
@@ -652,12 +650,12 @@ pub fn decode(text: String) -> Box<JFObject> {
 
                         chain.pop().unwrap();
                         chain.pop().unwrap();
-                        a_chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
+                        a_chain.pop().unwrap();
 
                     }
 
-                    _ => {
+                    'a' => {
 
 
                         if last_active_char == ',' {
@@ -684,6 +682,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
@@ -695,6 +694,8 @@ pub fn decode(text: String) -> Box<JFObject> {
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                         a_chain.pop().unwrap();
                     }
+
+                    _ => panic!("unknown chain from array"),
                 }
 
                 last_active_char = c.clone();
@@ -708,19 +709,59 @@ pub fn decode(text: String) -> Box<JFObject> {
                     's' => {}
                     'w' => {}
 
+                    'v' => {
+
+                        let a = 'd';
+                        chain.push(a);
+                        last_chain = a;
+
+                        let a_nest = 0i64;
+                        let d_nest = 0i64;
+                        let log: String = "".to_owned();
+
+                        fn func(v: &mut JFObject,
+                                _: Option<String>,
+                                _: Vec<i64>,
+                                d_chain: Vec<String>,
+                                _: i64,
+                                _: i64,
+                                _: char) {
+                            match *v {
+                                JFObject::Array(ref mut vv) => {
+                                    vv.push(JFObject::Dictionary(HashMap::new()));
+                                }
+                                JFObject::Dictionary(ref mut vv) => {
+                                    let key = d_chain.last().unwrap().clone();
+                                    vv.insert(key, JFObject::Dictionary(HashMap::new()));
+                                }
+                                _ => {}
+                            }
+                        }
+
+                        recursive(&mut ret,
+                                  a_chain.clone(),
+                                  d_chain.clone(),
+                                  a_nest,
+                                  d_nest,
+                                  last_chain,
+                                  last_c,
+                                  func,
+                                  None,
+                                  log);
+                    }
+
                     _ => {
 
                         let a = 'd';
                         chain.push(a);
                         last_chain = a;
 
-                        let is_root = match *ret {
 
+                        let is_root = match *ret {
                             JFObject::Null => {
                                 *ret = JFObject::Dictionary(HashMap::new());
                                 true
                             }
-
                             _ => false,
                         };
 
@@ -740,9 +781,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                         vv.push(JFObject::Dictionary(HashMap::new()));
                                     }
                                     JFObject::Dictionary(ref mut vv) => {
-
                                         let key = d_chain.last().unwrap().clone();
-
                                         vv.insert(key, JFObject::Dictionary(HashMap::new()));
                                     }
                                     _ => {}
@@ -753,6 +792,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
@@ -774,19 +814,16 @@ pub fn decode(text: String) -> Box<JFObject> {
                     't' => {
 
                         s_true.pop().unwrap();
+                        s_true = s_true.trim().to_string();
                         if s_true != "true" {
                             panic!("parse error");
                         }
 
                         chain.pop().unwrap();
-
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
 
-
                         if last_chain == 'v' {
-
                             chain.pop().unwrap();
-
                             let a_nest = 0i64;
                             let d_nest = 0i64;
                             let log: String = "".to_owned();
@@ -799,13 +836,9 @@ pub fn decode(text: String) -> Box<JFObject> {
                                     _: char) {
 
                                 match *v {
-
                                     JFObject::Dictionary(ref mut vv) => {
-
                                         let key = d_chain.last().unwrap().clone();
-
                                         vv.insert(key, JFObject::True);
-
                                     }
                                     _ => {}
                                 }
@@ -815,16 +848,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
                                       log);
-
-
                         }
 
                         s_true = "".to_owned();
-
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
@@ -832,20 +863,16 @@ pub fn decode(text: String) -> Box<JFObject> {
                     'f' => {
 
                         s_false.pop().unwrap();
+                        s_false = s_false.trim().to_string();
                         if s_false != "false" {
                             panic!("parse error");
                         }
 
                         chain.pop().unwrap();
-
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
 
-
                         if last_chain == 'v' {
-
                             chain.pop().unwrap();
-
-
                             let a_nest = 0i64;
                             let d_nest = 0i64;
                             let log: String = "".to_owned();
@@ -858,13 +885,9 @@ pub fn decode(text: String) -> Box<JFObject> {
                                     _: char) {
 
                                 match *v {
-
                                     JFObject::Dictionary(ref mut vv) => {
-
                                         let key = d_chain.last().unwrap().clone();
-
                                         vv.insert(key, JFObject::False);
-
                                     }
                                     _ => {}
                                 }
@@ -874,6 +897,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
@@ -882,7 +906,6 @@ pub fn decode(text: String) -> Box<JFObject> {
                         }
 
                         s_false = "".to_owned();
-
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
@@ -890,20 +913,17 @@ pub fn decode(text: String) -> Box<JFObject> {
                     '0' => {
 
                         s_null.pop().unwrap();
+                        s_null = s_null.trim().to_string();
                         if s_null != "null" {
                             panic!("parse error");
                         }
 
                         chain.pop().unwrap();
-
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
 
 
                         if last_chain == 'v' {
-
                             chain.pop().unwrap();
-
-
                             let a_nest = 0i64;
                             let d_nest = 0i64;
                             let log: String = "".to_owned();
@@ -916,13 +936,9 @@ pub fn decode(text: String) -> Box<JFObject> {
                                     _: char) {
 
                                 match *v {
-
                                     JFObject::Dictionary(ref mut vv) => {
-
                                         let key = d_chain.last().unwrap().clone();
-
                                         vv.insert(key, JFObject::Null);
-
                                     }
                                     _ => {}
                                 }
@@ -932,15 +948,14 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
                                       log);
-
                         }
 
                         s_null = "".to_owned();
-
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
@@ -948,13 +963,10 @@ pub fn decode(text: String) -> Box<JFObject> {
                     'n' => {
 
                         chain.pop().unwrap();
-
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
 
                         if last_chain == 'v' {
-
                             chain.pop().unwrap();
-
                             let a_nest = 0i64;
                             let d_nest = 0i64;
                             let log: String = "".to_owned();
@@ -967,15 +979,11 @@ pub fn decode(text: String) -> Box<JFObject> {
                                     _: char) {
 
                                 match *v {
-
                                     JFObject::Dictionary(ref mut vv) => {
-
                                         let key = d_chain.last().unwrap().clone();
-
                                         let mut value = value.unwrap();
                                         value.pop().unwrap();
                                         value = value.trim().to_string();
-
                                         match value.find('.') {
                                             Some(_) => vv.insert(key, JFObject::Float(f64::from_str(&value.clone()).unwrap()) ),
                                             None    => vv.insert(key, JFObject::Integer(i64::from_str(&value.clone()).unwrap()) ),
@@ -989,6 +997,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       Some(num.clone()),
@@ -1012,9 +1021,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
                 }
-
                 last_active_char = c.clone();
-
             }
 
             ':' => {
@@ -1053,7 +1060,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                     't' => {
 
                         s_true.pop().unwrap();
-
+                        s_true = s_true.trim().to_string();
                         if s_true != "true" {
                             panic!("parse error");
                         }
@@ -1089,6 +1096,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
@@ -1114,13 +1122,12 @@ pub fn decode(text: String) -> Box<JFObject> {
                     'f' => {
 
                         s_false.pop().unwrap();
-
+                        s_false = s_false.trim().to_string();
                         if s_false != "false" {
                             panic!("parse error");
                         }
 
                         if last_chain == 'f' {
-
                             let a_nest = 0i64;
                             let d_nest = 0i64;
                             let log: String = "".to_owned();
@@ -1150,6 +1157,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
@@ -1175,13 +1183,12 @@ pub fn decode(text: String) -> Box<JFObject> {
                     '0' => {
 
                         s_null.pop().unwrap();
-
+                        s_null = s_null.trim().to_string();
                         if s_null != "null" {
                             panic!("parse error");
                         }
 
                         if last_chain == '0' {
-
                             let a_nest = 0i64;
                             let d_nest = 0i64;
                             let log: String = "".to_owned();
@@ -1203,19 +1210,19 @@ pub fn decode(text: String) -> Box<JFObject> {
                                     _ => {}
                                 }
                             }
+                            chain.pop().unwrap();
                             recursive(&mut ret,
                                       a_chain.clone(),
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
                                       log);
 
                         }
-
-                        chain.pop().unwrap();
 
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
 
@@ -1256,13 +1263,12 @@ pub fn decode(text: String) -> Box<JFObject> {
                                       d_chain.clone(),
                                       a_nest,
                                       d_nest,
+                                      last_chain,
                                       last_c,
                                       func,
                                       None,
                                       log);
                         }
-
-
                     }
 
                     'n' => {
@@ -1326,6 +1332,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                   d_chain.clone(),
                                   a_nest,
                                   d_nest,
+                                  last_chain,
                                   last_c,
                                   func,
                                   Some(num),
@@ -1349,6 +1356,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                     'v' => {
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
+                        d_chain.pop().unwrap();
                     }
                     _ => {}
                 }
@@ -1396,11 +1404,11 @@ pub fn decode(text: String) -> Box<JFObject> {
                                           d_chain.clone(),
                                           a_nest,
                                           d_nest,
+                                          last_chain,
                                           last_c,
                                           func,
                                           Some(string.clone()),
                                           log);
-                                d_chain.pop().unwrap();
                                 string = "".to_owned();
                             } else if last_chain != 'd' {
                                 string.pop().unwrap();
@@ -1436,6 +1444,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                               d_chain.clone(),
                                               a_nest,
                                               d_nest,
+                                              last_chain,
                                               last_c,
                                               func,
                                               Some(string),
@@ -1492,6 +1501,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                           d_chain.clone(),
                                           a_nest,
                                           d_nest,
+                                          last_chain,
                                           last_c,
                                           func,
                                           Some(string.clone()),
@@ -1532,6 +1542,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                                               d_chain.clone(),
                                               a_nest,
                                               d_nest,
+                                              last_chain,
                                               last_c,
                                               func,
                                               Some(string),
@@ -1638,19 +1649,21 @@ pub fn decode(text: String) -> Box<JFObject> {
         };
 
         if DEBUG {
-            println!("\x1b[35mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- s: \
-                      {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
-                     body[pos],
-                     last_chain,
-                     chain,
-                     a_chain,
-                     d_chain,
-                     string,
-                     num,
-                     last_active_char,
-                     s_true,
-                     s_false,
-                     s_null);
+            if c != ' ' {
+                println!("\x1b[35mc: {}\t -- l: {}\t -- c: {:?}\t -- ac: {:?}\t -- dc: {:?}\t -- \
+                          s: {}\t -- n: {} -- lac: {} -- t: {} -- f: {} -- 0: {}\x1b[0m",
+                         body[pos],
+                         last_chain,
+                         chain,
+                         a_chain,
+                         d_chain,
+                         string,
+                         num,
+                         last_active_char,
+                         s_true,
+                         s_false,
+                         s_null);
+            }
         }
 
         pos += 1;
