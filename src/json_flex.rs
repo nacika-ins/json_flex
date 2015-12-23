@@ -1010,6 +1010,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                     }
 
                     'v' => {
+                        d_chain.pop().unwrap();
                         chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();

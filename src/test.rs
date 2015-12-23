@@ -771,7 +771,7 @@ fn default() {
 
     // 79
     // -------------------------------------------------------------------------------
-    // let mut f = File::open("stream2.txt").unwrap();
+    // let mut f = File::open("stream.txt").unwrap();
     // let mut s = String::new();
     // f.read_to_string(&mut s);
     // let jf = json_flex::decode(s);
