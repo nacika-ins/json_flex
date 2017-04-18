@@ -23,7 +23,6 @@ use json_flex::{JFObject, Unwrap};
 ```rust
 extern crate json_flex;
 #[warn(unused_imports)]
-use json_flex;
 use json_flex::{JFObject, Unwrap};
 
 fn main() {
