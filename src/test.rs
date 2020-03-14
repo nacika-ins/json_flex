@@ -771,6 +771,20 @@ fn default() {
 
     // 79
     // -------------------------------------------------------------------------------
+    println!("--- [ 79 ] -----------------------------------------------------------------");
+    let jf = json_flex::decode(r#"{"str":{"key":"ABC"},"int":{"key":0},"float":{"key":0.1},"map":{"key":{"k":"v"}},"vector":{"key":[0,1,2]},"null":{"key":null},"true":{"key":true},"false":{"key":false},"last":"last"}"#.to_owned());
+    println!("{}", jf.to_json());
+    assert_eq!(jf["str"]["key"].to_json(), r#""ABC""#);
+    assert_eq!(jf["int"]["key"].to_json(), r#"0"#);
+    assert_eq!(jf["float"]["key"].to_json(), r#"0.1"#);
+    assert_eq!(jf["map"]["key"].to_json(), r#"{"k":"v"}"#);
+    assert_eq!(jf["vector"]["key"].to_json(), r#"[0,1,2]"#);
+    assert_eq!(jf["null"]["key"].to_json(), r#"null"#);
+    assert_eq!(jf["true"]["key"].to_json(), r#"true"#);
+    assert_eq!(jf["false"]["key"].to_json(), r#"false"#);
+
+    // 80
+    // -------------------------------------------------------------------------------
     // let mut f = File::open("stream.txt").unwrap();
     // let mut s = String::new();
     // f.read_to_string(&mut s);

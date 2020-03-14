@@ -856,6 +856,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                         }
 
                         s_true = "".to_owned();
+                        d_chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
@@ -906,6 +907,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                         }
 
                         s_false = "".to_owned();
+                        d_chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
@@ -956,6 +958,7 @@ pub fn decode(text: String) -> Box<JFObject> {
                         }
 
                         s_null = "".to_owned();
+                        d_chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
@@ -1005,6 +1008,7 @@ pub fn decode(text: String) -> Box<JFObject> {
 
                         }
                         num = "".to_owned();
+                        d_chain.pop().unwrap();
                         chain.pop().unwrap();
                         last_chain = chain.last().unwrap_or(&' ').to_owned();
                     }
