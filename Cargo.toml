@@ -10,4 +10,4 @@ version = "0.3.3"
 authors = ["nacika <nacika.inscatolare@gmail.com>"]
 
 [dependencies]
-rustc-serialize="*"
+rustc-serialize="0.3.24"
